@@ -1,12 +1,43 @@
 import os
+from typing import TypedDict, NotRequired, Tuple
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
 
 class DataLoadingError(Exception):
     """Custom exception raised when data loading fails."""
 
 
-def load_data(file_path: str, url: str) -> pd.DataFrame:
+class ReadCsvParams(TypedDict):
+    """
+    Class for setting the parameters for reading a CSV file.
+
+    Attributes:
+        delimiter (str): Delimiter in the CSV file.
+        nrows (Optional[int]): Number of rows of file to read.
+    """
+
+    delimiter: str
+    nrows: NotRequired[int]
+
+
+class SaveCsvParams(TypedDict):
+    """
+    Class for setting the parameters for saving a CSV file.
+
+    Attributes:
+        sep (str): Delimiter in the output CSV file.
+    """
+
+    sep: str
+
+
+def load_data(
+    file_path: str,
+    url: str,
+    read_csv_params: ReadCsvParams,
+    save_csv_params: SaveCsvParams,
+) -> pd.DataFrame:
     """
     Loads data from a file if it exists, otherwise from a URL.
 
@@ -47,7 +78,7 @@ def load_data(file_path: str, url: str) -> pd.DataFrame:
         print(f"Loading data from file: {file_path}")
 
         # load the data form the file
-        df = pd.read_csv(file_path)  # type: ignore
+        df = pd.read_csv(file_path, **read_csv_params)  # type: ignore
 
         # return the loaded dataframe form local file
         return df
@@ -58,10 +89,11 @@ def load_data(file_path: str, url: str) -> pd.DataFrame:
 
         try:
             # file not found so try to get the data from the URL
-            df = pd.read_csv(url)  # type: ignore
+            df = pd.read_csv(url, **read_csv_params)  # type: ignore
 
             # save the DataFrame to the file for future use
-            df.to_csv(file_path, index=False)
+            df.to_csv(file_path, index=False, sep=save_csv_params["sep"])
+
             print(f"Data saved to file: {file_path}")
 
         except Exception as e:
@@ -69,3 +101,28 @@ def load_data(file_path: str, url: str) -> pd.DataFrame:
             raise DataLoadingError() from e
 
     return df
+
+
+def split_my_data(
+    X: pd.DataFrame, y: pd.Series, test_size: float, random_state: int
+) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
+    """
+    Wrapper for the sklearn tran_test function to have strict typing
+    Splits data into training and testing sets with strict type hints.
+
+    Args:
+        X: The features (input data). Can be a Pandas DataFrame or a NumPy array.
+        y: The target (output data). Can be a Pandas Series or a NumPy array.
+        test_size: The proportion of the dataset to include in the test split.
+        random_state: Controls the shuffling applied to the data before splitting.
+
+    Returns:
+        A tuple containing X_train, X_test, y_train, and y_test.
+
+    """
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=test_size, random_state=random_state
+    )
+
+    return X_train, X_test, y_train, y_test
