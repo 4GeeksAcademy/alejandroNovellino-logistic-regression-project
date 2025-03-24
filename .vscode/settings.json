@@ -2,5 +2,28 @@
 	"workbench.startupEditor": "readme",
 	"workbench.editorAssociations": {
 		"*.md": "vscode.markdown.preview.editor"
-	}
+	},
+	"cSpell.words": [
+		"annot",
+		"cbar",
+		"classif",
+		"cmap",
+		"dataframes",
+		"elasticnet",
+		"euribor",
+		"gridspec",
+		"hyperparams",
+		"lbfgs",
+		"liblinear",
+		"nrows",
+		"offdiag",
+		"pairplot",
+		"pdays",
+		"poutcome",
+		"proba",
+		"Scatterplots",
+		"seaborn",
+		"triu",
+		"vmax"
+	]
 }
